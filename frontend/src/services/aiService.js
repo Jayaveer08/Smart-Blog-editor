@@ -31,8 +31,29 @@ export const streamAI = async (text, action, token) => {
       throw new Error(errText || `AI request failed: ${response.status}`);
     }
 
-    if (!response.body) {
-      throw new Error("AI stream has no body");
+    // If server doesn't support streaming (serverless), fallback to non-streaming endpoint
+    if (!response.body || import.meta.env.VITE_DISABLE_STREAMING === "true") {
+      // Try non-streaming generate endpoint
+      const genRes = await fetch(`${API_BASE.replace(/\/$/, "")}/ai/generate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ text, action }),
+        signal: controller.signal,
+      });
+
+      if (!genRes.ok) {
+        const errText = await genRes.text().catch(() => null);
+        throw new Error(errText || `AI generate failed: ${genRes.status}`);
+      }
+
+      const data = await genRes.json();
+      appendResult(data.result || "");
+      useAIStore.getState().setController(null);
+      setGenerating(false);
+      return;
     }
 
     const reader = response.body.getReader();

@@ -37,3 +37,29 @@ npm run dev
 ```
 
 Advanced: If you prefer the frontend to call relative paths (e.g., `/api`) and proxy during dev, configure Vite server proxy in `vite.config.js` to forward `/api` to `http://localhost:8000`.
+
+### Deploying the backend to Vercel (serverless, non-streaming)
+
+If you want both frontend and backend on Vercel, note that Vercel serverless functions do not support long-lived streaming responses. Use the non-streaming endpoint `/api/ai/generate` (already added) and set the following env var for the frontend project:
+
+- `VITE_DISABLE_STREAMING=true`
+
+Steps:
+
+1. In Vercel, create a new Project -> Import GitHub repo.
+2. Set the **Root Directory** for the backend project to `backend`.
+3. In Project Settings -> Environment Variables add your secrets:
+	- `GEMINI_API_KEY` (optional)
+	- `GEMINI_MODEL` (optional)
+	- `SECRET_KEY`
+4. Also add `VITE_DISABLE_STREAMING=true` to your frontend project environment variables.
+5. For the backend project, set these Build & Start commands in Vercel's UI:
+	- Install Command: `pip install -r requirements.txt`
+	- Build Command: *(leave empty)*
+	- Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+
+6. Ensure `backend/requirements.txt` exists (committed). The repository includes a basic `requirements.txt` you can extend.
+
+Notes:
+- The non-streaming `/api/ai/generate` endpoint will be used for AI features when `VITE_DISABLE_STREAMING` is true.
+- If you want streaming support later, consider hosting the backend on Render/Railway which supports long-lived connections.

@@ -1,5 +1,9 @@
-# Python
+# Python virtual environments
+venv/
+.venv/
 backend/venv/
+
+# Python
 __pycache__/
 *.pyc
 .env
@@ -8,12 +12,9 @@ __pycache__/
 frontend/node_modules/
 frontend/dist/
 
-# OS
-.DS_Store
-Thumbs.db
-
 # IDE
 .vscode/
 
-# Logs
-*.log
+# OS
+.DS_Store
+Thumbs.db
