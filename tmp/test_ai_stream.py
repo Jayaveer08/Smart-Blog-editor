@@ -6,7 +6,7 @@ import requests
 # Create a token for test user
 token = security.create_access_token({"user_id": "testuser"})
 
-url = "http://localhost:8000/api/ai/stream"
+url = "https://smart-blog-editor-onmc.onrender.com/api/ai/stream"
 headers = {
     "Authorization": f"Bearer {token}",
     "Content-Type": "application/json",

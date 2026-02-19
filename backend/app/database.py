@@ -1,5 +1,10 @@
+import os
 from pymongo import MongoClient
 
-client = MongoClient("mongodb://localhost:27017")
+MONGO_URL = os.getenv("MONGO_URL")
+
+if not MONGO_URL:
+    raise Exception("MONGO_URL is not set!")
+
+client = MongoClient(MONGO_URL)
 db = client["smart_blog"]
-collection = db["posts"]
