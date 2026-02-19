@@ -1,8 +1,10 @@
 import useAIStore from "../store/useAIStore";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "https://smart-blog-editor-onmc.onrender.com/api";
+const API_BASE =
+  import.meta.env.VITE_API_BASE ||
+  "http://127.0.0.1:8000/api"; // 🔥 use local backend while developing
 
-export const streamAI = async (text, action, token) => {
+export const streamAI = async (text, action) => {
   const { setGenerating, appendResult, clearResult, setError } =
     useAIStore.getState();
 
@@ -10,12 +12,18 @@ export const streamAI = async (text, action, token) => {
     clearResult();
     setGenerating(true);
 
-    // Create AbortController so we can cancel streaming from UI
+    // ✅ Get token properly
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("User not authenticated. Please login again.");
+    }
+
     const controller = new AbortController();
     useAIStore.getState().setController(controller);
 
     const response = await fetch(
-      `${API_BASE.replace(/\/$/, "")}/ai/stream`,
+      `${API_BASE}/ai/stream`,
       {
         method: "POST",
         headers: {
@@ -26,23 +34,26 @@ export const streamAI = async (text, action, token) => {
         signal: controller.signal,
       }
     );
+
     if (!response.ok) {
       const errText = await response.text().catch(() => null);
       throw new Error(errText || `AI request failed: ${response.status}`);
     }
 
-    // If server doesn't support streaming (serverless), fallback to non-streaming endpoint
-    if (!response.body || import.meta.env.VITE_DISABLE_STREAMING === "true") {
-      // Try non-streaming generate endpoint
-      const genRes = await fetch(`${API_BASE.replace(/\/$/, "")}/ai/generate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ text, action }),
-        signal: controller.signal,
-      });
+    // 🔥 Fallback if streaming not supported
+    if (!response.body) {
+      const genRes = await fetch(
+        `${API_BASE}/ai/generate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ text, action }),
+          signal: controller.signal,
+        }
+      );
 
       if (!genRes.ok) {
         const errText = await genRes.text().catch(() => null);
@@ -51,7 +62,6 @@ export const streamAI = async (text, action, token) => {
 
       const data = await genRes.json();
       appendResult(data.result || "");
-      useAIStore.getState().setController(null);
       setGenerating(false);
       return;
     }
@@ -59,27 +69,17 @@ export const streamAI = async (text, action, token) => {
     const reader = response.body.getReader();
     const decoder = new TextDecoder("utf-8");
 
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        appendResult(chunk);
-      }
-    } finally {
-      // clear controller reference when finished
-      useAIStore.getState().setController(null);
-      setGenerating(false);
+      appendResult(decoder.decode(value, { stream: true }));
     }
+
+    setGenerating(false);
+
   } catch (err) {
-    // If aborted, provide a friendly message
-    if (err.name === "AbortError") {
-      setError("AI generation cancelled");
-    } else {
-      setError(err.message || "AI generation failed");
-    }
-    useAIStore.getState().setController(null);
+    setError(err.message || "AI generation failed");
     setGenerating(false);
   }
 };

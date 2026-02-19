@@ -31,18 +31,31 @@ API.interceptors.response.use(
 
 /* 🔐 LOGIN FUNCTION */
 export const loginUser = async (email, password) => {
-  const formData = new URLSearchParams()
-  formData.append("username", email) // OAuth2 uses username
-  formData.append("password", password)
+  const formData = new URLSearchParams();
+  formData.append("username", email);
+  formData.append("password", password);
 
-  const res = await API.post("/auth/login", formData, {
+  const response = await fetch("http://127.0.0.1:8000/api/auth/login", {
+    method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-  })
+    body: formData,
+  });
 
-  return res.data
-}
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.detail || "Login failed");
+  }
+
+  // ✅ STORE TOKEN HERE
+  localStorage.setItem("token", data.access_token);
+
+  return data;
+};
+
+
 
 /* Other API exports */
 export const createPost = (data) => API.post("/posts/", data)
