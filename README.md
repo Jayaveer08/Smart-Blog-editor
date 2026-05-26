@@ -2,10 +2,6 @@
 
 This repository contains a full-stack editor application (React + Lexical frontend, FastAPI backend) with AI-assisted generation, auto-save, and a streaming-friendly backend.
 
-**Deliverables**
-- Public GitHub repository: this repo.
-- Demo video: add a 2-minute Loom/YouTube link below after recording.
-- Deployed link: add the final frontend URL below once deployed.
 - System architecture diagram: see `diagrams/architecture.mmd`.
 
 **Setup Instructions**
@@ -52,11 +48,11 @@ npm run dev
  3. AI generation: click "Generate Summary", accept the result and show it inserted into the editor.
 - Upload to Loom or YouTube and paste the link here:
 
-- Demo URL: (paste your Loom/YouTube link here)
+- Demo
 
 **Deployed link**
-- Frontend URL: (paste deployed URL here)
-- Backend API URL: (paste backend URL here)
+- Frontend : Deployed
+- Backend API : Deployed
 
 **System Architecture Diagram**
 - See `diagrams/architecture.mmd` for a mermaid diagram. Render it with any mermaid renderer or view it in editors that support mermaid.
