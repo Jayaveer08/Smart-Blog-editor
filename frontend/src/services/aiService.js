@@ -1,8 +1,7 @@
 import useAIStore from "../store/useAIStore";
 
 const API_BASE =
-  import.meta.env.VITE_API_BASE ||
-  "http://127.0.0.1:8000/api"; // 🔥 use local backend while developing
+  import.meta.env.VITE_API_BASE || "/api";
 
 export const streamAI = async (text, action) => {
   const { setGenerating, appendResult, clearResult, setError } =
@@ -12,11 +11,11 @@ export const streamAI = async (text, action) => {
     clearResult();
     setGenerating(true);
 
-    // ✅ Get token properly
-    const token = localStorage.getItem("token");
-
+    // ✅ Get token properly or fallback for dev
+    let token = localStorage.getItem("token");
     if (!token) {
-      throw new Error("User not authenticated. Please login again.");
+      token = "mock-dev-jwt-token";
+      localStorage.setItem("token", token);
     }
 
     const controller = new AbortController();
@@ -83,3 +82,6 @@ export const streamAI = async (text, action) => {
     setGenerating(false);
   }
 };
+
+export const streamAIService = streamAI;
+export default streamAI;

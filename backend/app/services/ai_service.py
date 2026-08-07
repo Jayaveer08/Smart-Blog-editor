@@ -20,9 +20,23 @@ ai_collection = db["ai_usage"]
 
 async def build_prompt(text: str, action: str) -> str:
     if action == "summary":
-        return f"Summarize clearly and concisely:\n\n{text}"
+        return f"Summarize the following text clearly and concisely:\n\n{text}"
     elif action == "grammar":
-        return f"Fix grammar and improve clarity:\n\n{text}"
+        return f"Fix all grammar, spelling, and punctuation errors in the following text, keeping the original meaning intact:\n\n{text}"
+    elif action == "expand":
+        return f"Elaborate and expand on the following text with engaging details, clear explanations, and examples suitable for a high-quality blog post:\n\n{text}"
+    elif action == "outline":
+        return f"Generate a comprehensive, structured blog post outline with main sections, bullet points, and key takeaways for the topic:\n\n{text}"
+    elif action == "headline":
+        return f"Generate 5 catchy, high-converting, SEO-optimized blog headlines for:\n\n{text}"
+    elif action == "seo_meta":
+        return f"Generate an SEO Meta Title, Meta Description (max 160 chars), and 5 targeted keywords for:\n\n{text}"
+    elif action == "tone_casual":
+        return f"Rewrite the following text in a warm, conversational, and relatable tone:\n\n{text}"
+    elif action == "tone_professional":
+        return f"Rewrite the following text in a polished, authoritative, professional business tone:\n\n{text}"
+    elif action == "tone_punchy":
+        return f"Rewrite the following text in a bold, fast-paced, punchy, persuasive tone:\n\n{text}"
     return text
 
 

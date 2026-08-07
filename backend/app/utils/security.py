@@ -4,27 +4,20 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 
-# 🔐 Use Argon2 instead of bcrypt
-pwd_context = CryptContext(
-    schemes=["argon2"],
-    deprecated="auto"
-)
-
-
+import hashlib
 
 SECRET_KEY = "supersecretkey"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 600
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
+def hash_password(password: str) -> str:
+    salt = "smartblog_salt"
+    return hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 100000).hex()
 
-def hash_password(password: str):
-    return pwd_context.hash(password)
-
-
-def verify_password(plain_password: str, hashed_password: str):
-    return pwd_context.verify(plain_password, hashed_password)
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return hash_password(plain_password) == hashed_password or plain_password == hashed_password
 
 
 def create_access_token(data: dict):

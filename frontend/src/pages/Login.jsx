@@ -1,21 +1,37 @@
-import { useState } from "react"
-import { loginUser } from "../services/api"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../services/api";
 
 export default function Login() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    try {
-      const res = await loginUser(email, password)
-
-      localStorage.setItem("token", res.access_token)
-
-      window.location.href = "/"
-    } catch (err) {
-      alert("Invalid credentials")
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
     }
-  }
+
+    try {
+      setLoading(true);
+
+      const res = await loginUser(email, password);
+
+      // Store JWT token
+      localStorage.setItem("token", res.access_token);
+
+      // Redirect to home
+      navigate("/");
+    } catch (err) {
+      console.error("Login error:", err.response?.data || err.message);
+      alert(err.response?.data?.detail || "Invalid credentials");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-100">
@@ -40,11 +56,12 @@ export default function Login() {
 
         <button
           onClick={handleLogin}
-          className="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700"
+          disabled={loading}
+          className="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 disabled:bg-gray-400"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
       </div>
     </div>
-  )
+  );
 }
