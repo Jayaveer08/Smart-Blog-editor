@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import { $getRoot, $createParagraphNode, $createTextNode, $getSelection, $isRangeSelection } from "lexical"
 import {
@@ -10,24 +10,22 @@ import {
   PlusCircle,
   RefreshCw,
   X,
-  Volume2,
-  Sliders,
   Search,
-  MessageSquare,
   ArrowRight,
-  Layers,
   StopCircle,
+  CornerDownLeft,
 } from "lucide-react"
 import useAIStore from "../../store/useAIStore"
 import { streamAIService } from "../../services/aiService"
 
 export default function AIAssistant({ onClose, editorText }) {
   const [editor] = useLexicalComposerContext()
-  const { isGenerating, result, error, setGenerating, setController, cancelGeneration, appendResult, clearResult, setError } = useAIStore()
+  const { isGenerating, result, error, setGenerating, setController, cancelGeneration, clearResult, setError } = useAIStore()
   
   const [customPrompt, setCustomPrompt] = useState("")
   const [selectedTone, setSelectedTone] = useState("professional")
   const [copied, setCopied] = useState(false)
+  const resultContainerRef = useRef(null)
 
   const presetPrompts = [
     { id: "outline", label: "Blog Outline", icon: FileText, desc: "Generate post structure & subheadings" },
@@ -37,6 +35,13 @@ export default function AIAssistant({ onClose, editorText }) {
     { id: "seo_meta", label: "SEO Meta Description", icon: Search, desc: "Meta title, tags & description" },
   ]
 
+  // Auto scroll down to result container when result changes or starts generating
+  useEffect(() => {
+    if ((result || isGenerating) && resultContainerRef.current) {
+      resultContainerRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" })
+    }
+  }, [result, isGenerating])
+
   const triggerAIAction = async (actionType, customInput = null) => {
     clearResult()
     setError(null)
@@ -45,25 +50,15 @@ export default function AIAssistant({ onClose, editorText }) {
     const textToProcess = customInput || editorText || "Write an engaging blog post about modern digital productivity tools."
 
     try {
-      const controller = await streamAIService(
-        textToProcess,
-        actionType,
-        (chunk) => appendResult(chunk),
-        (err) => {
-          setError(err.message || "Failed to generate AI response")
-          setGenerating(false)
-        },
-        () => setGenerating(false)
-      )
-      setController(controller)
+      await streamAIService(textToProcess, actionType)
     } catch (e) {
-      setError(e.message)
+      setError(e.message || "Failed to generate content")
       setGenerating(false)
     }
   }
 
   const handleCustomSubmit = (e) => {
-    e.preventDefault()
+    if (e) e.preventDefault()
     if (!customPrompt.trim()) return
     triggerAIAction("expand", customPrompt)
   }
@@ -84,19 +79,6 @@ export default function AIAssistant({ onClose, editorText }) {
         p.append($createTextNode(pText.trim()))
         root.append(p)
       })
-    })
-  }
-
-  const handleReplaceSelection = () => {
-    if (!result) return
-    editor.update(() => {
-      const selection = $getSelection()
-      if ($isRangeSelection(selection)) {
-        selection.insertText(result)
-      } else {
-        const root = $getRoot()
-        root.append($createTextNode("\n" + result))
-      }
     })
   }
 
@@ -139,7 +121,7 @@ export default function AIAssistant({ onClose, editorText }) {
               type="text"
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
-              placeholder="e.g. Write an intro for a blog post on AI trends..."
+              placeholder="e.g. Write an birthday blog..."
               className="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-3 pl-3.5 pr-10 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-inner"
             />
             <button
@@ -215,9 +197,10 @@ export default function AIAssistant({ onClose, editorText }) {
       </div>
 
       {/* Result Display & Insertion Actions */}
-      <div className="mt-4 pt-4 border-t border-slate-700/60">
+      <div ref={resultContainerRef} className="mt-4 pt-4 border-t border-slate-700/60">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+            <Sparkles size={14} className="text-indigo-400" />
             {isGenerating ? "Generating Result..." : "AI Generated Output"}
           </span>
           {isGenerating && (
@@ -236,7 +219,7 @@ export default function AIAssistant({ onClose, editorText }) {
           </div>
         )}
 
-        <div className="min-h-[140px] max-h-[220px] overflow-y-auto p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl text-xs text-slate-300 leading-relaxed font-mono whitespace-pre-wrap shadow-inner">
+        <div className="min-h-[140px] max-h-[220px] overflow-y-auto p-3.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 leading-relaxed font-mono whitespace-pre-wrap shadow-inner">
           {result ? (
             result
           ) : isGenerating ? (
@@ -251,22 +234,23 @@ export default function AIAssistant({ onClose, editorText }) {
         </div>
 
         {/* Action buttons */}
-        <div className="grid grid-cols-2 gap-2 mt-3">
+        <div className="grid grid-cols-1 gap-2 mt-3">
           <button
             type="button"
             onClick={handleInsertIntoEditor}
             disabled={!result || isGenerating}
-            className="flex items-center justify-center gap-1.5 py-2 px-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white font-medium text-xs rounded-xl shadow-lg transition"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 disabled:opacity-40 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition transform active:scale-95"
           >
-            <PlusCircle size={15} /> Append to Post
+            <PlusCircle size={16} /> Insert Generated Text Into Editor
           </button>
+          
           <button
             type="button"
             onClick={copyToClipboard}
             disabled={!result || isGenerating}
-            className="flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 font-medium text-xs rounded-xl border border-slate-700 transition"
+            className="w-full flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 font-medium text-xs rounded-xl border border-slate-700 transition"
           >
-            <Copy size={14} /> {copied ? "Copied!" : "Copy Output"}
+            <Copy size={14} /> {copied ? "Copied!" : "Copy Output to Clipboard"}
           </button>
         </div>
       </div>
