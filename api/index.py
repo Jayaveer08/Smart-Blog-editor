@@ -8,3 +8,4 @@ from app.main import app
 
 # Export ASGI app for Vercel Serverless Function
 handler = app
+app = app
