@@ -95,7 +95,7 @@ class MockDB:
 try:
     if not MONGO_URL:
         raise Exception("MONGO_URL not set")
-    client = MongoClient(MONGO_URL, serverSelectionTimeoutMS=2000, connectTimeoutMS=2000)
+    client = MongoClient(MONGO_URL, serverSelectionTimeoutMS=500, connectTimeoutMS=500)
     # Check connection
     client.admin.command('ping')
     db = client["smart_blog"]
