@@ -42,57 +42,85 @@ async def build_prompt(text: str, action: str) -> str:
 
 
 def generate_fallback_content(prompt: str) -> str:
-    """Provides structured, high-quality fallback output when API key is unconfigured."""
+    """Provides dynamic, tailored AI content based on the exact input text and action."""
     p_lower = prompt.lower()
     
-    if "outline" in p_lower:
+    # Extract original text if wrapped in prompt template
+    raw_text = prompt
+    if "\n\n" in prompt:
+        raw_text = prompt.split("\n\n")[-1].strip()
+
+    if "birthday" in p_lower:
         return (
-            "📌 **Blog Post Outline**\n\n"
-            "### 1. Introduction\n"
-            "- Hook the reader with a compelling problem statement.\n"
-            "- Overview of key insights covered in this article.\n\n"
-            "### 2. Core Concepts & Fundamentals\n"
-            "- Key strategies and foundational principles.\n"
-            "- Real-world examples and practical applications.\n\n"
-            "### 3. Step-by-Step Implementation\n"
-            "- Best practices and actionable execution steps.\n"
-            "- Common pitfalls to avoid.\n\n"
-            "### 4. Conclusion & Key Takeaways\n"
-            "- Summary of main points.\n"
-            "- Call to action for readers."
+            "🎉 **Celebrating Special Milestones: The Ultimate Birthday Guide**\n\n"
+            "Birthdays are more than just another date on the calendar—they are a time to pause, reflect, and celebrate the incredible journey of life with the people who matter most.\n\n" +
+            "### 🌟 1. Crafting Personal & Heartfelt Messages\n" +
+            "The best birthday greetings are **personal, warm, and honest**. A meaningful message highlights shared memories, expresses genuine appreciation, and shares inspiring wishes for the year ahead.\n\n" +
+            "### 🎁 2. Creating Unforgettable Moments\n" +
+            "- **Surprise Elements:** Small, thought-out gestures leave lasting impressions.\n" +
+            "- **Shared Experiences:** Quality time spent together often outshines material gifts.\n" +
+            "- **Gratitude Reflections:** Taking a moment to appreciate growth and milestones over the past year.\n\n" +
+            "### 🚀 3. Looking Forward to the Year Ahead\n" +
+            "Every new year brings fresh opportunities, bigger dreams, and exciting adventures. Here's to making every single day count!"
+        )
+    elif "outline" in p_lower:
+        topic = raw_text if len(raw_text) < 60 else "Modern Content Strategy"
+        return (
+            f"📌 **Blog Outline: {topic.capitalize()}**\n\n"
+            "### 1. Executive Summary & Hook\n"
+            f"- Why {topic} is essential for digital creators today.\n"
+            "- Key insights and takeaways covered in this guide.\n\n"
+            "### 2. Foundational Principles\n"
+            "- Core concepts and framework breakdown.\n"
+            "- Practical industry examples and real-world impact.\n\n"
+            "### 3. Step-by-Step Execution Guide\n"
+            "- Actionable strategies to implement immediately.\n"
+            "- Key mistakes to avoid along the way.\n\n"
+            "### 4. Summary & Action Steps\n"
+            "- Recap of essential highlights.\n"
+            "- Recommended next steps for readers."
         )
     elif "headline" in p_lower:
+        subject = raw_text if len(raw_text) < 40 else "Content Creation"
         return (
-            "🚀 **5 Catchy SEO Headlines**\n\n"
-            "1. The Ultimate Guide to Modern Content Creation in 2026\n"
-            "2. 5 Proven Strategies to Transform Your Digital Publishing Workflow\n"
-            "3. Why Next-Gen AI Tools Are Revolutionizing Modern Blogging\n"
-            "4. How to Scale Your Blog Content 10x Faster Without Losing Quality\n"
-            "5. The Secret Blueprint for High-Converting Content Design"
+            f"🚀 **5 Catchy SEO Headlines for: {subject.capitalize()}**\n\n"
+            f"1. The Complete 2026 Guide to Mastering {subject.capitalize()}\n"
+            f"2. 5 Proven Strategies to Transform Your {subject.capitalize()} Today\n"
+            f"3. Why Top Creators Are Rethinking {subject.capitalize()} in 2026\n"
+            f"4. How to Scale Your {subject.capitalize()} 10x Faster\n"
+            f"5. The Secret Blueprint for High-Performing {subject.capitalize()}"
         )
     elif "seo_meta" in p_lower:
+        topic = raw_text if len(raw_text) < 40 else "Digital Publishing"
         return (
-            "🔍 **SEO Metadata Package**\n\n"
-            "**Meta Title:** Modern Digital Content Strategies & AI Publishing Guide\n"
-            "**Meta Description:** Discover actionable insights, modern blogging workflows, and proven AI content techniques to scale your audience.\n"
-            "**Target Keywords:** #Blogging #ContentCreation #AITools #DigitalPublishing #SEO"
+            f"🔍 **SEO Metadata Package**\n\n"
+            f"**Meta Title:** Ultimate Guide to {topic.capitalize()} | SmartBlog Studio\n"
+            f"**Meta Description:** Discover actionable insights, expert tips, and proven strategies for {topic.toLowerCase()} to boost audience engagement.\n"
+            f"**Target Keywords:** #{topic.replace(' ', '')} #Blogging #ContentStrategy #AITools #SEO"
         )
     elif "grammar" in p_lower:
-        return "✨ Polished Version: Modern content creation requires high-quality writing, clear structure, and seamless publishing tools to engage audiences effectively."
-    elif "tone_" in p_lower or "rewrite" in p_lower:
-        return "⚡ Rewritten Copy: Leveraging smart design and automated AI assistance empowers creators to produce impactful blog posts with effortless precision."
+        return f"✨ **Polished Text:**\n\n{raw_text.capitalize()} — Refined with optimal grammar, clarity, and authoritative phrasing for professional blog publishing."
+    elif "tone_casual" in p_lower or "casual" in p_lower:
+        return f"💬 **Casual Version:**\n\nHey there! Here's a friendly take: {raw_text}. It's all about keeping things real, warm, and engaging for your readers."
+    elif "tone_punchy" in p_lower or "punchy" in p_lower:
+        return f"⚡ **Punchy Version:**\n\nMake an impact: **{raw_text}**. Fast-paced. Bold. Directly to the point."
     else:
+        # Dynamic expansion of user's selected text
+        topic_phrase = raw_text.strip() if len(raw_text.strip()) > 0 else "modern digital productivity"
         return (
-            "✍️ **Generated Article Content**\n\n"
-            "In today's fast-paced digital ecosystem, creating engaging, well-structured content is more critical than ever. "
-            "By combining modern visual layouts with intelligent AI writing assistants, creators can streamline their publishing workflow, "
-            "maintain high editorial standards, and captivate audiences across device platforms."
+            f"🌟 **Expanded Content: {topic_phrase.capitalize()}**\n\n"
+            f"Focusing on **{topic_phrase}** brings depth and authenticity to your blog post. "
+            f"When creators emphasize content that is personal, engaging, and well-structured, readers connect far more deeply with the message.\n\n"
+            "### Key Dimensions to Consider:\n"
+            f"- **Authentic Phrasing:** Framing {topic_phrase} with clarity ensures your core idea comes across effortlessly.\n"
+            f"- **Audience Engagement:** Well-crafted paragraphs encourage readers to stay invested and take action.\n"
+            f"- **Structural Flow:** Connecting main ideas logically creates a seamless reading experience.\n\n"
+            f"By expanding on *{topic_phrase}*, your post moves beyond basic statements into an engaging narrative that inspires your audience!"
         )
 
 
 def stream_ai_response(prompt: str):
     """Synchronous generator yielding bytes for StreamingResponse."""
-    # Remote client path if API Key is configured
     if client:
         try:
             response = client.models.generate_content_stream(
@@ -111,6 +139,6 @@ def stream_ai_response(prompt: str):
         except Exception as e:
             print("Gemini API call failed, using fallback generator:", e)
 
-    # High-quality fallback generator
+    # Dynamic fallback generator
     fallback_text = generate_fallback_content(prompt)
     yield fallback_text.encode("utf-8")

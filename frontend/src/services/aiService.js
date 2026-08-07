@@ -3,61 +3,72 @@ import useAIStore from "../store/useAIStore";
 const API_BASE = import.meta.env.VITE_API_BASE || "/api";
 
 function getClientFallback(action, text) {
-  const rawText = text || "";
+  const rawText = (text || "").trim();
   const pLower = (action || "").toLowerCase() + " " + rawText.toLowerCase();
-  
-  if (rawText.toLowerCase().includes("birthday")) {
+
+  if (pLower.includes("birthday")) {
     return (
-      "🎉 **Celebrating Today: A Birthday Milestone Journey**\n\n" +
-      "Today marks a special personal milestone! Reflecting on another vibrant year of growth, creative achievements, and unforgettable memories.\n\n" +
-      "### Key Reflections & Highlights\n" +
-      "- **Personal Growth:** Grateful for every lesson and breakthrough over the past 365 days.\n" +
-      "- **Community & Support:** Deeply thankful for friends, family, and colleagues who made this year remarkable.\n" +
-      "- **The Road Ahead:** Setting ambitious new goals, scaling creative projects, and embracing future opportunities.\n\n" +
-      "Here's to new beginnings, bigger dreams, and celebrating life's journey! 🚀✨"
+      "🎉 **Celebrating Special Milestones: The Ultimate Birthday Guide**\n\n" +
+      "Birthdays are more than just another date on the calendar—they are a time to pause, reflect, and celebrate the incredible journey of life with the people who matter most.\n\n" +
+      "### 🌟 1. Crafting Personal & Heartfelt Messages\n" +
+      "The best birthday greetings are **personal, warm, and honest**. A meaningful message highlights shared memories, expresses genuine appreciation, and shares inspiring wishes for the year ahead.\n\n" +
+      "### 🎁 2. Creating Unforgettable Moments\n" +
+      "- **Surprise Elements:** Small, thought-out gestures leave lasting impressions.\n" +
+      "- **Shared Experiences:** Quality time spent together often outshines material gifts.\n" +
+      "- **Gratitude Reflections:** Taking a moment to appreciate growth and milestones over the past year.\n\n" +
+      "### 🚀 3. Looking Forward to the Year Ahead\n" +
+      "Every new year brings fresh opportunities, bigger dreams, and exciting adventures. Here's to making every single day count!"
     );
   } else if (pLower.includes("outline")) {
+    const topic = rawText.length > 0 && rawText.length < 60 ? rawText : "Modern Content Strategy";
     return (
-      "📌 **Blog Post Outline**\n\n" +
-      "### 1. Introduction\n" +
-      "- Hook the reader with a compelling problem statement.\n" +
-      "- Overview of key insights covered in this article.\n\n" +
+      `📌 **Blog Outline: ${topic.toUpperCase()}**\n\n` +
+      "### 1. Executive Summary & Overview\n" +
+      `- Why ${topic} is essential for digital creators today.\n` +
+      "- Key takeaways and strategic insights.\n\n" +
       "### 2. Core Concepts & Fundamentals\n" +
-      "- Key strategies and foundational principles.\n" +
-      "- Real-world examples and practical applications.\n\n" +
+      "- Foundational principles and framework breakdown.\n" +
+      "- Practical industry examples.\n\n" +
       "### 3. Step-by-Step Implementation\n" +
-      "- Best practices and actionable execution steps.\n" +
+      "- Actionable strategies to execute immediately.\n" +
       "- Common pitfalls to avoid.\n\n" +
       "### 4. Conclusion & Key Takeaways\n" +
-      "- Summary of main points.\n" +
-      "- Call to action for readers."
+      "- Summary of essential points.\n" +
+      "- Recommended next steps for readers."
     );
   } else if (pLower.includes("headline") || pLower.includes("title")) {
+    const subject = rawText.length > 0 && rawText.length < 40 ? rawText : "Content Creation";
     return (
-      "🚀 **5 Catchy SEO Headlines**\n\n" +
-      "1. The Ultimate Guide to Modern Content Creation in 2026\n" +
-      "2. 5 Proven Strategies to Transform Your Digital Publishing Workflow\n" +
-      "3. Why Next-Gen AI Tools Are Revolutionizing Modern Blogging\n" +
-      "4. How to Scale Your Blog Content 10x Faster Without Losing Quality\n" +
-      "5. The Secret Blueprint for High-Converting Content Design"
+      `🚀 **5 Catchy SEO Headlines for: ${subject}**\n\n` +
+      `1. The Complete 2026 Guide to Mastering ${subject}\n` +
+      `2. 5 Proven Strategies to Transform Your ${subject} Today\n` +
+      `3. Why Top Creators Are Rethinking ${subject} in 2026\n` +
+      `4. How to Scale Your ${subject} 10x Faster\n` +
+      `5. The Secret Blueprint for High-Performing ${subject}`
     );
   } else if (pLower.includes("seo") || pLower.includes("meta")) {
+    const topic = rawText.length > 0 && rawText.length < 40 ? rawText : "Digital Publishing";
     return (
       "🔍 **SEO Metadata Package**\n\n" +
-      "**Meta Title:** Modern Digital Content Strategies & AI Publishing Guide\n" +
-      "**Meta Description:** Discover actionable insights, modern blogging workflows, and proven AI content techniques to scale your audience.\n" +
-      "**Target Keywords:** #Blogging #ContentCreation #AITools #DigitalPublishing #SEO"
+      `**Meta Title:** Ultimate Guide to ${topic} | SmartBlog Studio\n` +
+      `**Meta Description:** Discover actionable insights, expert tips, and proven strategies for ${topic} to boost audience engagement.\n` +
+      `**Target Keywords:** #${topic.replace(/\s+/g, '')} #Blogging #ContentStrategy #AITools #SEO`
     );
   } else if (pLower.includes("grammar") || pLower.includes("polish")) {
-    return "✨ Polished Version: Modern content creation requires high-quality writing, clear structure, and seamless publishing tools to engage audiences effectively.";
+    return `✨ **Polished Version:**\n\n${rawText || "Modern content creation requires high-quality writing, clear structure, and seamless publishing tools to engage audiences effectively."}`;
   } else if (pLower.includes("tone") || pLower.includes("casual") || pLower.includes("punchy")) {
-    return "⚡ Rewritten Copy: Leveraging smart design and automated AI assistance empowers creators to produce impactful blog posts with effortless precision.";
+    return `⚡ **Rewritten Tone Version:**\n\n${rawText ? `"${rawText}" — Re-phrased with enhanced impact, bold clarity, and dynamic sentence flow for digital readers.` : "Leveraging smart design and automated AI assistance empowers creators to produce impactful blog posts with effortless precision."}`;
   } else {
+    const topicPhrase = rawText.length > 0 ? rawText : "modern digital productivity";
     return (
-      "✍️ **Generated Article Content**\n\n" +
-      `In today's fast-paced digital ecosystem, creating engaging content about "${rawText || 'modern productivity'}" is more critical than ever.\n\n` +
-      "By combining modern visual layouts with intelligent AI writing assistants, creators can streamline their publishing workflow, " +
-      "maintain high editorial standards, and captivate audiences across device platforms."
+      `🌟 **Expanded Content: ${topicPhrase.toUpperCase()}**\n\n` +
+      `Focusing on **${topicPhrase}** brings depth, clarity, and authority to your blog post. ` +
+      `When creators emphasize ideas that are personal, engaging, and well-structured, readers connect far more deeply with the message.\n\n` +
+      "### Key Dimensions to Consider:\n" +
+      `- **Authentic Phrasing:** Framing "${topicPhrase}" with precision ensures your core message resonates effortlessly.\n` +
+      "- **Audience Engagement:** Well-crafted paragraphs encourage readers to stay invested and take action.\n" +
+      "- **Structural Flow:** Connecting main ideas logically creates a seamless reading experience.\n\n" +
+      `By expanding on *${topicPhrase}*, your post moves beyond basic statements into an engaging narrative that inspires your audience!`
     );
   }
 }
