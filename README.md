@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 Smart Blog Studio — AI-Powered Editor
+# 🚀 Smart Blog Studio — AI-Powered Editor & Publisher
 
 [![Vercel](https://img.shields.io/badge/Deploy%20with-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FJayaveer08%2FSmart-Blog-editor)
 [![React](https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
