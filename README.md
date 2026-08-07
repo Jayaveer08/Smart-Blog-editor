@@ -1,64 +1,122 @@
-# Smart Blog Editor
+<div align="center">
 
-This repository contains a full-stack editor application (React + Lexical frontend, FastAPI backend) with AI-assisted generation, auto-save, and a streaming-friendly backend.
+# 🚀 Smart Blog Studio — AI-Powered Editor & SaaS Dashboard
 
-- System architecture diagram: see `diagrams/architecture.mmd`.
+[![Vercel](https://img.shields.io/badge/Deploy%20with-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FJayaveer08%2FSmart-Blog-editor)
+[![React](https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Gemini AI](https://img.shields.io/badge/Gemini%20AI-Streaming-8E44AD?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 
-**Setup Instructions**
-- Backend (Windows example):
+An enterprise-grade, high-performance **Wix-inspired Smart Blog Editor & Publishing Studio** built with **React**, **slothUI**, **Lexical WYSIWYG Framework**, and **FastAPI**. Includes real-time **AI Script Writer assistant**, contextual selection bubble menus, debounced autosave, and live responsive Wix site previewing.
 
-```powershell
+[🌐 Live Demo (Vercel)](https://smart-blog-editor.vercel.app) • [📖 Architecture Diagram](#-system-architecture) • [⚡ Quick Start](#-getting-started)
+
+</div>
+
+---
+
+## ✨ Features at a Glance
+
+### 📱 1. slothUI Rich WYSIWYG Editor
+- **Advanced Formatting Toolbar**: Headings (H1/H2/H3), Bold, Italic, Underline, Strikethrough, Blockquotes, Lists (Bullet/Numbered), and Monospace Code Blocks.
+- **Word & Character Counters**: Dynamic reading time estimator and character counter.
+- **Debounced Auto-Save**: Background autosaving with status indicators (`Saving...`, `Saved`).
+
+### 🤖 2. AI Script Writer Assistant (`AIAssistant.jsx`)
+- **Side Drawer Experience**: Smooth slide-over side panel for AI content generation.
+- **Preset Prompt Engineering**:
+  - 📝 **Blog Outline Generator**: Structures posts with H2/H3 section breakdowns.
+  - 🚀 **5 Catchy Headlines**: Generates click-worthy titles tailored for maximum engagement.
+  - 🔍 **SEO Metadata Creator**: Auto-generates meta titles, meta descriptions, and tags.
+- **Tone Converter**: Rewrite content in *Professional*, *Casual*, or *Punchy* tones.
+- **Streaming Tokens**: Direct streaming response rendering token-by-token into the active document.
+
+### ⚡ 3. Contextual Selection Bubble Menu (`BubbleMenu.jsx`)
+- **Floating Inline Toolbar**: Appears floating directly above highlighted text in the editor canvas.
+- **Quick AI Actions**:
+  - 🛡️ **Fix Grammar**: Auto-corrects syntax and spelling.
+  - 🪄 **Expand Text**: Elongates paragraphs with rich contextual details.
+  - ⚡ **Make Punchy**: Condenses long-winded sentences into impactful copy.
+  - ✨ **Summarize**: Generates concise TL;DR bullet points.
+
+### 🎨 4. Wix-Style Blog Studio & Dashboard (`Sidebar.jsx`, `Layout.jsx`)
+- **Status Filter Tabs**: Filter post drafts by **All**, **Drafts**, or **Published**.
+- **Instant Search**: Real-time keyword filtering across saved post titles.
+- **Onboarding Templates**: Quick-start starter templates for rapid post drafting.
+
+### 🖥️ 5. Live Wix Site Preview Modal (`LivePreviewModal.jsx`)
+- **Dual Device Mockups**: Preview posts in **Desktop (1024px)** and **Mobile (375px)** device viewports before publishing.
+- **Responsive Layout**: Renders styled blog typography matching live web production sites.
+
+### 🛡️ 6. Resilient Backend & Monorepo Serverless Engine
+- **MockDB Fallback**: In-memory database layer ensuring 100% backend uptime if MongoDB is unavailable.
+- **Frictionless Auth**: Automatic guest user creation & JWT authentication.
+- **Vercel Serverless Integration**: Monorepo routing mapping `/api/*` to FastAPI serverless handlers (`api/index.py`).
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    Client["React Frontend (slothUI + Lexical)"] -->|Debounced Auto-Save| FastAPI["FastAPI Backend (/api)"]
+    Client -->|AI Generation Stream| AIService["AI Script Writer Service"]
+    AIService -->|Stream Tokens| Gemini["Google Gemini API"]
+    FastAPI -->|Document Store| MongoDB["MongoDB / MockDB Fallback"]
+    Client -->|Live Preview| WixModal["Responsive Wix Site Preview Modal"]
+```
+
+---
+
+## ⚡ Getting Started
+
+### Prerequisites
+- Node.js 18+
+- Python 3.10+
+- (Optional) MongoDB Atlas & Gemini API Key
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Jayaveer08/Smart-Blog-editor.git
+cd Smart-Blog-editor
+```
+
+### 2. Backend Setup
+```bash
 cd backend
 python -m venv .venv
-.\\.venv\\Scripts\\activate
+# On Windows:
+.\.venv\Scripts\activate
+# On macOS/Linux:
+source .venv/bin/activate
+
 pip install -r requirements.txt
-.\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --reload --port 8000
 ```
+Backend API will run at `http://127.0.0.1:8000` (Swagger UI at `http://127.0.0.1:8000/docs`).
 
-- Frontend:
-
+### 3. Frontend Setup
 ```bash
-cd frontend
+cd ../frontend
 npm install
 npm run dev
-# open http://localhost:5173
 ```
+Open `http://localhost:5173` in your browser.
 
-- Environment variables:
-  - Backend: `GEMINI_API_KEY`, `GEMINI_MODEL`, `SECRET_KEY`, `MONGODB_URI` (if used)
-  - Frontend: `VITE_API_BASE` (e.g. `http://localhost:8000/api`), `VITE_DISABLE_STREAMING` (set `true` for serverless backends)
+---
 
-**Auto-save logic (explanation)**
-- **What triggers autosave:** the editor state is observed and debounced (1s) before sending to the backend. This avoids excessive network requests while ensuring user data is saved shortly after they stop typing.
-- **Where it saves:** the autosave endpoint posts the serialized Lexical editor JSON and metadata (title, slug, timestamps) to the backend `POST /api/posts` route.
-- **Conflict handling:** the frontend uses last-write-wins with a timestamp. The backend can be extended to handle versioned updates or operational transforms if multi-user editing is added later.
-- **Why this design:** debouncing keeps UX responsive and minimizes writes; storing Lexical JSON preserves rich editor state (styles, nodes, links) for accurate restoration.
+## 🌐 Deploying to Vercel
 
-**Database schema rationale**
-- **Choice:** a document store (MongoDB) is recommended because the editor stores rich, nested JSON (Lexical document state) which maps naturally to a document DB.
-- **Schema highlights:**
-  - `posts` collection fields: `title` (string), `slug` (string, indexed), `content` (Lexical JSON blob), `summary` (string), `author_id` (ref), `created_at`, `updated_at`.
-  - `ai_usage` collection: stores prompt, model, tokens (if available), and timestamp for billing or analytics.
-- **Why this schema:** document DBs allow storing rich `content` without mapping to relational tables; indexing `slug` and `author_id` enables fast lookups and queries for listing.
+1. Fork or import `https://github.com/Jayaveer08/Smart-Blog-editor` into [Vercel](https://vercel.com/new).
+2. Configure **Environment Variables** in Vercel settings:
+   - `GEMINI_API_KEY`: Your Gemini API Key
+   - `MONGO_URL`: MongoDB Connection URI *(optional, defaults to MockDB)*
+   - `JWT_SECRET`: `supersecretkey`
+3. Click **Deploy**. Vercel will automatically build the frontend static output and mount FastAPI serverless endpoints at `/api/*`.
 
-**Demo video (2-minute walkthrough)**
-- Record these three sequences:
-  1. Editor typing and formatting (title + a paragraph + bold/italic).
- 2. Show Auto-save: edit something, wait ~1s for the autosave indicator, and show the backend console/log or a list view updating.
- 3. AI generation: click "Generate Summary", accept the result and show it inserted into the editor.
-- Upload to Loom or YouTube and paste the link here:
+---
 
-- Demo
+## 📄 License
 
-**Deployed link**
-- Frontend : Deployed
-- Backend API : Deployed
-
-**System Architecture Diagram**
-- See `diagrams/architecture.mmd` for a mermaid diagram. Render it with any mermaid renderer or view it in editors that support mermaid.
-
-**Troubleshooting**
-- If AI generation returns raw instruction text, try toggling `VITE_DISABLE_STREAMING` and check backend logs for the model response.
-- If streaming errors occur on Vercel, deploy the backend to Render/Railway and set `VITE_API_BASE` accordingly.
-
-If you want, I can record the demo steps locally or help you assemble the final Loom video script.
+Distributed under the MIT License. See `LICENSE` for details.
