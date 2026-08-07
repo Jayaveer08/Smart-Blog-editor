@@ -10,7 +10,7 @@
 
 An enterprise-grade, high-performance **Wix-inspired Smart Blog Editor & Publishing Studio** built with **React**, **slothUI**, **Lexical WYSIWYG Framework**, and **FastAPI**. Includes real-time **AI Script Writer assistant**, contextual selection bubble menus, debounced autosave, and live responsive Wix site previewing.
 
-[🌐 Live Demo (Vercel)](https://smart-blog-editor.vercel.app) • [📖 Architecture Diagram](#-system-architecture) • [⚡ Quick Start](#-getting-started)
+[🌐 Live Demo (Vercel)](https://smart-blog-editor-eight.vercel.app) • [📖 Architecture Diagram](#-system-architecture) • [⚡ Quick Start](#-getting-started)
 
 </div>
 
