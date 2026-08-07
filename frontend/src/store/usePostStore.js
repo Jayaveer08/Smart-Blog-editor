@@ -32,6 +32,15 @@ export const usePostStore = create((set, get) => ({
     }
   },
 
+  fetchPostById: async (id) => {
+    try {
+      const res = await getPostById(id)
+      set({ currentPost: res.data })
+    } catch (err) {
+      console.error("Fetch post failed:", err)
+    }
+  },
+
   // ➕ Create new draft
   createNewPost: async () => {
     try {

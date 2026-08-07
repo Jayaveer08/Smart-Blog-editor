@@ -3,9 +3,20 @@ import useAIStore from "../store/useAIStore";
 const API_BASE = import.meta.env.VITE_API_BASE || "/api";
 
 function getClientFallback(action, text) {
-  const pLower = (action || "").toLowerCase() + " " + (text || "").toLowerCase();
+  const rawText = text || "";
+  const pLower = (action || "").toLowerCase() + " " + rawText.toLowerCase();
   
-  if (pLower.includes("outline")) {
+  if (rawText.toLowerCase().includes("birthday")) {
+    return (
+      "🎉 **Celebrating Today: A Birthday Milestone Journey**\n\n" +
+      "Today marks a special personal milestone! Reflecting on another vibrant year of growth, creative achievements, and unforgettable memories.\n\n" +
+      "### Key Reflections & Highlights\n" +
+      "- **Personal Growth:** Grateful for every lesson and breakthrough over the past 365 days.\n" +
+      "- **Community & Support:** Deeply thankful for friends, family, and colleagues who made this year remarkable.\n" +
+      "- **The Road Ahead:** Setting ambitious new goals, scaling creative projects, and embracing future opportunities.\n\n" +
+      "Here's to new beginnings, bigger dreams, and celebrating life's journey! 🚀✨"
+    );
+  } else if (pLower.includes("outline")) {
     return (
       "📌 **Blog Post Outline**\n\n" +
       "### 1. Introduction\n" +
@@ -44,7 +55,7 @@ function getClientFallback(action, text) {
   } else {
     return (
       "✍️ **Generated Article Content**\n\n" +
-      `In today's fast-paced digital ecosystem, creating engaging content about "${text || 'digital tools'}" is more critical than ever.\n\n` +
+      `In today's fast-paced digital ecosystem, creating engaging content about "${rawText || 'modern productivity'}" is more critical than ever.\n\n` +
       "By combining modern visual layouts with intelligent AI writing assistants, creators can streamline their publishing workflow, " +
       "maintain high editorial standards, and captivate audiences across device platforms."
     );
