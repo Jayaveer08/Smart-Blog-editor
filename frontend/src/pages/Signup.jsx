@@ -65,7 +65,7 @@ export default function Signup() {
             <Sparkles size={28} className="text-white" />
           </div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight">Create Account</h1>
-          <p className="text-slate-400 text-xs mt-1">Join SmartBlog Studio today</p>
+          <p className="text-slate-400 text-xs mt-1">Join Smart Blog Editor today</p>
         </div>
 
         {errorMsg && (

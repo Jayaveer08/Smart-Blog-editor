@@ -41,7 +41,7 @@ export default function Login() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/25 mb-4">
             <Sparkles size={28} className="text-white" />
           </div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">SmartBlog Studio</h1>
+          <h1 className="text-2xl font-extrabold text-white tracking-tight">Smart Blog Editor</h1>
           <p className="text-slate-400 text-xs mt-1">Sign in to your AI Blog Dashboard</p>
         </div>
 

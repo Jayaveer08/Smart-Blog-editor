@@ -28,11 +28,11 @@ export default function Layout({ children }) {
               <Sparkles size={18} className="text-white" />
             </div>
             <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-              SmartBlog<span className="text-indigo-400">Studio</span>
+              Smart Blog<span className="text-indigo-400"> Editor</span>
             </span>
           </div>
           <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 font-medium">
-            AI + slothUI
+            AI Blog Editor
           </span>
         </div>
 

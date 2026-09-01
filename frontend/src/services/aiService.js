@@ -50,7 +50,7 @@ function getClientFallback(action, text) {
     const topic = rawText.length > 0 && rawText.length < 40 ? rawText : "Digital Publishing";
     return (
       "🔍 **SEO Metadata Package**\n\n" +
-      `**Meta Title:** Ultimate Guide to ${topic} | SmartBlog Studio\n` +
+      `**Meta Title:** Ultimate Guide to ${topic} | Smart Blog Editor\n` +
       `**Meta Description:** Discover actionable insights, expert tips, and proven strategies for ${topic} to boost audience engagement.\n` +
       `**Target Keywords:** #${topic.replace(/\s+/g, '')} #Blogging #ContentStrategy #AITools #SEO`
     );
