@@ -63,22 +63,43 @@ async def login_user(form_data: OAuth2PasswordRequestForm):
     }
 
 
-# 🔹 Forgot Password - Send reset link (graceful stub, no email enumeration)
+# 🔹 Forgot Password — Generate token & send real reset email
 async def forgot_password_user(email: str):
     """
-    Looks up user and would normally send an email with a reset link.
-    Always returns success to prevent email enumeration.
+    Generates a secure password reset token, stores it, and emails the user.
+    Always returns a generic success response to prevent email enumeration.
     """
+    import secrets
+
     try:
+        from app.utils.email import send_reset_email
+
         user = users_collection.find_one({"email": email})
         if user:
-            # In production: generate a secure reset token and send an email here.
-            # e.g., send_reset_email(email, generate_reset_token(email))
-            print(f"[Auth] Password reset requested for existing account: {email}")
-        else:
-            print(f"[Auth] Password reset requested for unknown account: {email}")
-    except Exception as e:
-        print(f"[Auth] Forgot password DB error: {e}")
+            # Generate a cryptographically secure token
+            reset_token = secrets.token_urlsafe(32)
 
-    # Always return success to avoid exposing registered emails
-    return {"message": "If an account exists for this email, a reset link has been sent."}
+            # Store the token in the user record with expiry timestamp
+            from datetime import datetime, timedelta
+            expiry = datetime.utcnow() + timedelta(hours=1)
+            users_collection.update_one(
+                {"email": email},
+                {"$set": {
+                    "reset_token": reset_token,
+                    "reset_token_expiry": expiry
+                }}
+            )
+
+            # Send the email (non-blocking on failure)
+            sent = send_reset_email(email, reset_token)
+            if sent:
+                print(f"[Auth] Password reset email sent to: {email}")
+            else:
+                print(f"[Auth] Email send failed for: {email} — check SMTP_USER/SMTP_PASSWORD env vars in Vercel.")
+        else:
+            print(f"[Auth] No account found for: {email}")
+    except Exception as e:
+        print(f"[Auth] Forgot password error: {e}")
+
+    # Always return success — never reveal whether the email exists
+    return {"message": "If an account exists for this email, a password reset link has been sent."}
