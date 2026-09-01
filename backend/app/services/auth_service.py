@@ -103,3 +103,39 @@ async def forgot_password_user(email: str):
 
     # Always return success — never reveal whether the email exists
     return {"message": "If an account exists for this email, a password reset link has been sent."}
+
+
+# 🔹 Check if email exists (for no-email reset flow)
+async def check_email_exists(email: str):
+    try:
+        user = users_collection.find_one({"email": email})
+        return {"exists": user is not None}
+    except Exception:
+        # If DB is unavailable (MockDB), allow them to proceed
+        return {"exists": True}
+
+
+# 🔹 Direct Password Reset (no email token required)
+async def reset_password_direct(email: str, new_password: str):
+    if not email or not new_password:
+        raise HTTPException(status_code=400, detail="Email and new password are required.")
+
+    if len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
+
+    try:
+        user = users_collection.find_one({"email": email})
+        if not user:
+            raise HTTPException(status_code=404, detail="No account found with that email.")
+
+        users_collection.update_one(
+            {"email": email},
+            {"$set": {"password": hash_password(new_password)}}
+        )
+        return {"message": "Password updated successfully."}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"[Auth] Direct reset error: {e}")
+        raise HTTPException(status_code=500, detail="Password reset failed. Please try again.")
+
