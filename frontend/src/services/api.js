@@ -30,7 +30,7 @@ API.interceptors.response.use(
   }
 );
 
-/* 🔐 LOGIN FUNCTION */
+/* 🔐 LOGIN */
 export const loginUser = async (email, password) => {
   const formData = new URLSearchParams();
   formData.append("username", email);
@@ -39,13 +39,20 @@ export const loginUser = async (email, password) => {
   const res = await axios.post(
     `${API_BASE}/auth/login`,
     formData,
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    }
+    { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
   );
+  return res.data;
+};
 
+/* 🆕 REGISTER */
+export const registerUser = async (name, email, password) => {
+  const res = await axios.post(`${API_BASE}/auth/register`, { name, email, password });
+  return res.data;
+};
+
+/* 🔑 FORGOT PASSWORD */
+export const forgotPassword = async (email) => {
+  const res = await axios.post(`${API_BASE}/auth/forgot-password`, { email });
   return res.data;
 };
 

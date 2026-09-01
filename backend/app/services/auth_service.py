@@ -61,3 +61,24 @@ async def login_user(form_data: OAuth2PasswordRequestForm):
         "access_token": token,
         "token_type": "bearer"
     }
+
+
+# 🔹 Forgot Password - Send reset link (graceful stub, no email enumeration)
+async def forgot_password_user(email: str):
+    """
+    Looks up user and would normally send an email with a reset link.
+    Always returns success to prevent email enumeration.
+    """
+    try:
+        user = users_collection.find_one({"email": email})
+        if user:
+            # In production: generate a secure reset token and send an email here.
+            # e.g., send_reset_email(email, generate_reset_token(email))
+            print(f"[Auth] Password reset requested for existing account: {email}")
+        else:
+            print(f"[Auth] Password reset requested for unknown account: {email}")
+    except Exception as e:
+        print(f"[Auth] Forgot password DB error: {e}")
+
+    # Always return success to avoid exposing registered emails
+    return {"message": "If an account exists for this email, a reset link has been sent."}

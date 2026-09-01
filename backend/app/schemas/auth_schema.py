@@ -8,8 +8,13 @@ class UserRegister(BaseModel):
     password: str
 
 
-
 # 🔹 Login Schema (Optional, not used with OAuth2 form)
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+
+# 🔹 Forgot Password Schema
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+

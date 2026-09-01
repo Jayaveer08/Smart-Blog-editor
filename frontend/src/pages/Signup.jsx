@@ -1,33 +1,56 @@
 import React, { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { loginUser } from "../services/api"
-import { Sparkles, ArrowRight, Lock, Mail, Eye, EyeOff } from "lucide-react"
+import { registerUser } from "../services/api"
+import { Sparkles, ArrowRight, Lock, Mail, User, Eye, EyeOff, CheckCircle2 } from "lucide-react"
 
-export default function Login() {
+export default function Signup() {
   const navigate = useNavigate()
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPw, setConfirmPw] = useState("")
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState("")
+  const [success, setSuccess] = useState(false)
 
-  const handleLogin = async (e) => {
+  const handleSignup = async (e) => {
     if (e) e.preventDefault()
-    if (!email || !password) {
-      setErrorMsg("Please enter both email and password.")
+    if (!name || !email || !password || !confirmPw) {
+      setErrorMsg("Please fill in all fields.")
+      return
+    }
+    if (password !== confirmPw) {
+      setErrorMsg("Passwords do not match.")
+      return
+    }
+    if (password.length < 6) {
+      setErrorMsg("Password must be at least 6 characters.")
       return
     }
     try {
       setLoading(true)
       setErrorMsg("")
-      const res = await loginUser(email, password)
-      localStorage.setItem("token", res.access_token)
-      navigate("/")
+      await registerUser(name, email, password)
+      setSuccess(true)
+      setTimeout(() => navigate("/login"), 2500)
     } catch (err) {
-      setErrorMsg(err.response?.data?.detail || "Invalid email or password.")
+      setErrorMsg(err.response?.data?.detail || "Registration failed. Please try again.")
     } finally {
       setLoading(false)
     }
+  }
+
+  if (success) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-slate-950 text-slate-100 p-4 font-sans">
+        <div className="text-center">
+          <CheckCircle2 size={56} className="text-emerald-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-2">Account Created!</h2>
+          <p className="text-slate-400 text-sm">Redirecting you to Sign In...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -37,12 +60,12 @@ export default function Login() {
 
       <div className="w-full max-w-md p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl backdrop-blur-xl z-10">
         {/* Branding */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-7">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/25 mb-4">
             <Sparkles size={28} className="text-white" />
           </div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">SmartBlog Studio</h1>
-          <p className="text-slate-400 text-xs mt-1">Sign in to your AI Blog Dashboard</p>
+          <h1 className="text-2xl font-extrabold text-white tracking-tight">Create Account</h1>
+          <p className="text-slate-400 text-xs mt-1">Join SmartBlog Studio today</p>
         </div>
 
         {errorMsg && (
@@ -51,7 +74,22 @@ export default function Login() {
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSignup} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Full Name</label>
+            <div className="relative">
+              <User size={16} className="absolute left-3.5 top-3 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Your full name"
+                required
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
             <div className="relative">
@@ -68,17 +106,12 @@ export default function Login() {
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-semibold text-slate-300">Password</label>
-              <Link to="/forgot-password" className="text-[11px] text-indigo-400 hover:text-indigo-300 transition">
-                Forgot password?
-              </Link>
-            </div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Password</label>
             <div className="relative">
               <Lock size={16} className="absolute left-3.5 top-3 text-slate-500" />
               <input
                 type={showPw ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="Min. 6 characters"
                 required
                 className="w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
                 value={password}
@@ -94,20 +127,35 @@ export default function Login() {
             </div>
           </div>
 
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Confirm Password</label>
+            <div className="relative">
+              <Lock size={16} className="absolute left-3.5 top-3 text-slate-500" />
+              <input
+                type={showPw ? "text" : "password"}
+                placeholder="Re-enter password"
+                required
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                value={confirmPw}
+                onChange={(e) => setConfirmPw(e.target.value)}
+              />
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
             className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 transition disabled:opacity-50"
           >
-            {loading ? <span>Signing in...</span> : <><span>Sign In to Studio</span><ArrowRight size={16} /></>}
+            {loading ? <span>Creating account...</span> : <><span>Create My Account</span><ArrowRight size={16} /></>}
           </button>
         </form>
 
         <div className="mt-6 pt-5 border-t border-slate-800/80 text-center">
           <p className="text-xs text-slate-400">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-indigo-400 hover:text-indigo-300 font-semibold transition">
-              Create one — it's free
+            Already have an account?{" "}
+            <Link to="/login" className="text-indigo-400 hover:text-indigo-300 font-semibold transition">
+              Sign In
             </Link>
           </p>
         </div>
