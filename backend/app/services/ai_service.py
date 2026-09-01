@@ -14,13 +14,13 @@ if GEMINI_API_KEY:
         from google import genai
         client = genai.Client(api_key=GEMINI_API_KEY)
     except Exception as e:
-        print("GenAI Client Init Exception:", e)
+        print("[AI] GenAI Client Init Exception:", e)
 
 ai_collection = db["ai_usage"]
 
 
 async def log_ai_usage(user_id: str, action: str, input_length: int):
-    """Log AI usage to MongoDB (or silently skip if MockDB)."""
+    """Log AI usage to MongoDB — silently skips if collection unavailable."""
     try:
         ai_collection.insert_one({
             "user_id": user_id,
@@ -33,6 +33,7 @@ async def log_ai_usage(user_id: str, action: str, input_length: int):
 
 
 async def build_prompt(text: str, action: str) -> str:
+    """Build the full prompt string for a given action type."""
     if action == "summary":
         return f"Summarize the following text clearly and concisely:\n\n{text}"
     elif action == "grammar":
@@ -63,7 +64,7 @@ def generate_fallback_content(prompt: str) -> str:
     if "birthday" in p:
         return (
             "🎉 **Celebrating Special Milestones: The Ultimate Birthday Guide**\n\n"
-            "Birthdays are more than just another date — they are a time to pause, reflect, and celebrate the incredible journey of life.\n\n"
+            "Birthdays are more than just another date — they are a time to pause and celebrate life.\n\n"
             "### 🌟 1. Crafting Heartfelt Messages\nThe best birthday greetings are personal, warm, and honest.\n\n"
             "### 🎁 2. Creating Unforgettable Moments\n- Small gestures leave lasting impressions.\n- Quality time together outshines material gifts.\n\n"
             "### 🚀 3. Looking Forward\nEvery new year brings bigger dreams. Here's to making every day count!"
@@ -74,7 +75,7 @@ def generate_fallback_content(prompt: str) -> str:
             f"### 1. Introduction\n- Why {topic} matters for modern creators.\n\n"
             "### 2. Core Concepts\n- Key principles and real-world applications.\n\n"
             "### 3. Step-by-Step Guide\n- Actionable strategies to implement today.\n\n"
-            "### 4. Conclusion\n- Key takeaways and next steps."
+            "### 4. Conclusion\n- Key takeaways and recommended next steps."
         )
     elif "headline" in p:
         return (
@@ -89,26 +90,26 @@ def generate_fallback_content(prompt: str) -> str:
         return (
             f"🔍 **SEO Metadata**\n\n"
             f"**Meta Title:** Ultimate Guide to {topic.capitalize()} | Smart Blog Editor\n"
-            f"**Meta Description:** Discover actionable insights and proven strategies for {topic} to boost audience engagement and drive results.\n"
+            f"**Meta Description:** Discover actionable insights and proven strategies for {topic} to boost audience engagement.\n"
             f"**Target Keywords:** #{topic.replace(' ', '')} #Blogging #ContentStrategy #SEO"
         )
     elif "grammar" in p or "polish" in p or "fix" in p:
-        return f"✨ **Polished Version:**\n\n{raw}\n\n*(Refined for clarity, grammar, and professional tone.)*"
+        return f"✨ **Polished Version:**\n\n{raw}\n\n*(Refined for clarity and professional tone.)*"
     elif "casual" in p:
-        return f"💬 **Casual Version:**\n\nHey! Here's a friendly take:\n\n{raw}\n\nKeep it real and relatable for your readers!"
+        return f"💬 **Casual Version:**\n\nHey! Here's a friendly take:\n\n{raw}\n\nKeep it real and relatable!"
     elif "punchy" in p:
-        return f"⚡ **Punchy Version:**\n\n**{raw}**\n\nFast. Bold. Impactful. That's how it's done."
+        return f"⚡ **Punchy Version:**\n\n**{raw}**\n\nFast. Bold. Impactful."
     elif "professional" in p:
         return f"🏢 **Professional Version:**\n\n{raw}\n\n*(Rewritten with authoritative tone and executive-level clarity.)*"
     else:
         return (
             f"🌟 **Expanded Content: {topic.capitalize()}**\n\n"
-            f"When it comes to **{topic}**, depth and authenticity make all the difference in modern digital publishing.\n\n"
+            f"When it comes to **{topic}**, depth and authenticity make all the difference.\n\n"
             "### Key Dimensions to Explore:\n"
-            f"- **Clarity:** Frame your ideas around *{topic}* with precision so readers immediately grasp your message.\n"
-            "- **Engagement:** Well-crafted paragraphs keep readers invested and drive them to take action.\n"
-            "- **Flow:** Connect your ideas logically for a seamless reading experience.\n\n"
-            f"By expanding on *{topic}*, your content moves beyond surface-level statements into an inspiring narrative!"
+            f"- **Clarity:** Frame your ideas around *{topic}* with precision.\n"
+            "- **Engagement:** Well-crafted paragraphs keep readers invested.\n"
+            "- **Flow:** Connect ideas logically for a seamless reading experience.\n\n"
+            f"By expanding on *{topic}*, your content becomes an inspiring narrative!"
         )
 
 
@@ -129,8 +130,7 @@ def stream_ai_response(prompt: str):
                     continue
             return
         except Exception as e:
-            print("Gemini API call failed, using fallback generator:", e)
+            print("[AI] Gemini API call failed, using fallback:", e)
 
-    # Instant client-side fallback
-    fallback_text = generate_fallback_content(prompt)
-    yield fallback_text.encode("utf-8")
+    # Client-side fallback
+    yield generate_fallback_content(prompt).encode("utf-8")
